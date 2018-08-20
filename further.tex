@@ -1,0 +1,20 @@
+%!Tex root = ./Main.tex
+\section{Further Research}
+\label{sec:further}
+
+We believe that there are numerous ways how the framework we presented can be extended. First, real world problems are complicated by uncertainty in some sort. However, what we have done so far only considers models that include no uncertainty. Second, AGI will learn while it already operates. That means that a company will not sell a finished product. We assume that an AGI may already perform certain tasks e.g. in a household and at the same time learn how to do them better or learn completely new tasks. This problem can be solved with inverse reinforcement learning. Lastly, combination of DRL with different kinds of logic can further improve the agent's behaviour.
+
+\subsection{Uncertainty}
+There are two kinds of uncertainty that can be modelled with MDP. First, uncertainty can arise because actions are no longer deterministic in the sense that taking an action in a certain state of the world leads to another state of the world with a probability of one.  
+
+Second, there is uncertainty with regards to the state of the world that the agent is in. For example, it could be the case that it rains, or it could be that it does not rain. But if you are locked in a basement without a window or any other means to receive information from the outside world, you are uncertain whether it rains. 
+
+We anticipate that allowing for these kinds of uncertainty in DRL primarily affects the formulation of norms. For example, it might be necessary to formulate a norm that the DRL takes the action which maximises the probability to transition to another state. Or, if the agent is unsure whether a child is drowning in a pond, we might impose the norm that the agent has to ensure that no child is drowning, before the agent goes on with their business. 
+
+\subsection{Inverse Reinforcement Learning}
+We believe that the extension of the presented framework to Inverse Reinforcement Learning holds much potential for future benefits. In inverse reinforcement learning (IRL) there is no programmer setting a reward structure \citep{ng2000algorithms}. Instead the agent infers the preferences of a ``teacher'' and tries to learn the reward function. Standard assumption of this approach is that the teacher is well-intentioned, meaning that she performs no immoral actions. However, we may face the situation where an AGI learns while already operating. This could be, because we want it to learn the preferences of its owners, or because training is not feasible as not enough data is available. In such a situation the assumption of a well-intentioned teacher may be violated. One only needs to remember the twitter bot Tay \citep{reese2016tay}, which learned what to say from interaction with users. Within a short amount of time, the bot learned racist and sexist slurs. If we build an AGI that is capable of learning from less-than-well-intentioned humans, then we run a substantial risk that the AGI commits wrongful acts. One option is to avoid designing AGI that is based on IRL. A more attractive alternative is to make use of a deontic inverse reinforcement learning framework, where deontic norms restrict the set of actions that the AGI can perform. As long as the set of deontic norms is not complete, the AGI will still be able to commit wrongful acts. However, the set of wrongful acts that it can commit is more restricted if we make use of the deontic inverse reinforcement learning framework. 
+
+\subsection{Logic}
+\label{sec:logic}
+
+The introduction of atomic sentences was done with a tighter integration with different logics in mind. Most obvious are deontic logic \citep{horty2001agency} and dyadic deontic logic \citep{prakken1997dyadic}, giving the agent a more holistic approach to ethical decision making. But temporal logic has already been proven to be useful in the context of reinforcement learning for temporally complex norms, see for example \citet{ding2011ltl,wolff2012robust}. 

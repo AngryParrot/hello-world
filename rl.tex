@@ -1,0 +1,11 @@
+%!Tex root = ./Main.tex
+\section{Reinforcement Learning}
+\label{rl}
+
+AI has had great breakthroughs in recent years. Many success stories that were covered in the media were made possible by reinforcement learning (RL).
+
+RL emphasises the interaction of an agent with an environment. The agent receives information about the state of the world. Based on this information it chooses an action that affects the world. Given that applications based on RL can be vastly superior to humans, this raises the question how an RL agent leans which action it should perform? The idea of RL is that we tell the agent \emph{what} it should do, but not \emph{how}. The 'what' is described by an evaluation of some goal state. In the case of the game Go, the evaluation of the final position is whether the agent has won, lost, or drawn the game. The 'how' is specified by some policy, assigning an action that should be performed, given that the agent is in some state of the world. We do not provide the agent such a policy, we let the agent figure this policy out on their own.
+
+Markov Decision Processes (MDP) often build the foundation for the decision making problem for which reinforcement learning is supposed to solve.\footnote{Other variants of MDP, for which RL is used as well, are partially observable MDP (POMDP), Markov Games, and partially observable stochastic game (POSG).}
+
+A MDP can be descripted as a five-tuple: $\langle \mathcal{A,S,R,T,\gamma} \rangle$. $\mathcal{A}$ is the set of actions, $\mathcal{S}$ is the set of states. The reward is given by $\mathcal{R}(s,a): \mathcal{A} \times \mathcal{S} \rightarrow \mathds{R}$. $\mathcal{T}(s,a,s^{\prime}) = Pr(s^{\prime} | s,a)$ defines a probability of transitioning from state $s \in \mathcal{S}$ to the state $s^{\prime} \in \mathbf{S}$ when the agent performs action $a \in \mathcal{A}$. Lastly, $\gamma \in [0,1]$ is a discount factor on $\mathcal{R}$. 

@@ -1,0 +1,173 @@
+\documentclass[12pt]{article}
+
+%\setlength{\parindent}{0pt}
+
+\usepackage[margin=3.5cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{setspace} %Um im Titel den Zeilenabstand zu ändern
+%\usepackage{url}
+%\def\UrlBreaks{\do\/\do-}
+%\usepackage{breakurl}
+\usepackage[]{hyperref} %Hyperlink Package
+\usepackage{caption} %Causes hyperref to jump to the top of a figure and not below it.
+
+\usepackage[english]{babel} % English language/hyphenation
+\selectlanguage{english}
+
+\usepackage[nottoc,numbib]{tocbibind} %To ensure that the bibliography is included in the ToC.
+
+\usepackage{todonotes}
+\usepackage{booktabs} % For Toprule, Midrule and Bottomrule commands in tabular environment. (Adds space before and after hlines for better readability.)
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\usepackage{csquotes}
+
+
+\usepackage{graphicx} %Graphics package
+\usepackage{subcaption}
+\usepackage{tikz}
+
+\usepackage{caption} %This causes reference to figures to jump to the top of the figure and not to the caption. Requires package hyperref
+\usepackage{ dsfont }
+
+\usepackage{float}
+\usepackage{color}
+
+\usepackage{tabularx}
+\usepackage{booktabs} % For Toprule, Midrule and Bottomrule commands in tabular environment. (Adds space before and after hlines for better readability.)
+\usepackage[]{natbib}
+\bibpunct{(}{)}{,}{a}{}{,}
+
+\begin{document}
+\bibliographystyle{abbrvnat}
+
+\begin{titlepage}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+
+\center % Center everything on the page
+ 
+%----------------------------------------------------------------------------------------
+%	HEADING SECTIONS
+%----------------------------------------------------------------------------------------
+
+\textsc{\LARGE University of Bayreuth}\\[0.5cm] % Name of your university/college
+\begin{spacing}{1.8}
+\textsc{\Large Ethics and Governance of Algorithmic Decision Making}\\[0.5cm] % Major heading such as course name
+\end{spacing}
+%\textsc{\large First Paper}\\[0.5cm] % Minor heading such as course title
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\HRule \\[0.4cm]
+\begin{spacing}{2.3}
+{ \huge \bfseries
+Deontic Reinforcement Learning: A Path Towards Safe AI?}\\ \end{spacing} % Title of your document
+\HRule \\[1.5cm]
+%----------------------------------------------------------------------------------------
+%	AUTHOR SECTION
+%----------------------------------------------------------------------------------------
+
+\begin{minipage}[c][2cm][t]{0.4\textwidth} %Specifies that the minipages is in the [c]enter, has a height of [2cm], and the text is positioned at the [t]op.
+\begin{flushleft} \large
+\emph{Author}\\
+Torben \textsc{Swoboda} \\% Your name
+\end{flushleft}
+\end{minipage}
+\begin{minipage}[c][2cm][t]{0.4\textwidth} %Specifies that the minipages is in the [c]enter, has a height of [2cm], and the text is positioned at the [t]op.
+\begin{flushright} \large
+\emph{Supervisors} \\
+Marco \textsc{Mayer}\\
+Carsten \textsc{Jung}\\
+Herman \textsc{Vulwulen} % Supervisor's Name
+\end{flushright}
+\end{minipage}\\[3.cm]
+
+% If you don't want a supervisor, uncomment the two lines below and remove the section above
+%\Large \emph{Author:}\
+%John \textsc{Smith}\[3cm] % Your name
+
+%----------------------------------------------------------------------------------------
+%	LOGO SECTION
+%----------------------------------------------------------------------------------------
+
+
+
+\includegraphics{./Graphics/logo}\\[1cm] % Include a department/university logo - this will require the graphicx package
+
+
+
+%----------------------------------------------------------------------------------------
+%	DATE SECTION
+%----------------------------------------------------------------------------------------
+
+{\large \today}% Date, change the \today to a set date if you want to be precise
+
+
+ 
+%----------------------------------------------------------------------------------------
+
+\vfill % Fill the rest of the page with whitespace
+
+\end{titlepage}
+
+%\newpage
+
+\abstract{ \noindent
+As AI becomes more advanced, it will be used to solve problems in complex, real-world environments. In recent years there has been an increasing interest in ensuring that AI is safe to use, i.e. that the AI behaves in ways that aligns with human values. Reinforcement Learning (RL) has gained popularity as an ethical decision making framework to model such advanced AI. In this paper we explore the integration of norms and reinforcement learning into a new framework we call \emph{Deontic Reinforcement Learning} (DRL). DRL imposes restrictions on the set of actions a RL agent can choose. For example, some actions are obligatory, while others are forbidden to perform. We argue that DRL is a more reliable framework in ensuring that AI behaves in ethically acceptable ways, compared to the traditional RL framework. However, DRL comes with certain caveats. The most substantial one which we identify are \emph{Deontic Lock States} (DLS). DLS are a state of the world, where the DRL agent cannot choose any action to perform. This situation arises for example, when all actions are considered to be forbidden. We offer a formal solution, in the form of a preference ranking over the norms. However, we also point out the limitations of this solution. In particular, the agent can learn to execute a policy which includes a deontic lock state. Given that a deontic lock state is an ethical dilemma situation, there are cases where we prefer the agent to avoid learning such a policy.} %There are no obvious solutions to this kind of problem. Lastly, we encourage further research in various ways. Most important, the extension of deontic norms to Inverse Reinforcement Learning (DIRL). A DIRL agent can be trained by malicious intentioned humans, while still ensuring that certain immoral behaviours are avoided.}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\input{Introduction}
+
+
+%\input{rl}
+%General Framework; Sutton
+%David Abel and James MacGlashan and Michael L. Littman
+%Toy Examples for Proof of Concept
+
+\input{rledm}
+%Thomas Arnold and Daniel Kasenberg and Matthias Scheutz
+%Integrating Deontic Logic into a RL Framework
+%Advantage: Providing a set of deontic rules inreases the reliability of the AI to reach morally permissible outcomes.
+%Toy Example (Important!)
+%Problem of Deontic Logic: Contrary-to-Duty Obligations
+%Preference Ranking of Norms
+
+\input{drl}
+
+%Advantage: If a complete set of ethical rules is provided, the programmer can use DRL while knowing that it reliably makes morally permissible decisions
+%Proof of Concept with Toy Example
+%Limits: Deontic Lock States
+
+
+
+\input{further}
+%Further Research: IRL
+%Outlook: Inference of Ethical Rules - Increase of Domain where the AI makes reliably acceptable decisions
+
+
+%\input{Conclusion}
+%RL as an Framework for Ethical Decision Making
+%Problems in cases where Duties are not learned
+%Reliability can be increased with DLRL
+%Problem with CTD Obligations
+%DDLRL can solve this issue; increases reliability of ethical outcomes produced by AI
+%Outlook:	-Extend the model to IRL, for a practical benefit of using DDLRL. So far, the results can be replicated by carefully choosing the utility function.
+%			-How to infer a set of ethical rules with ordering of worlds where duties are/are not satisfied
+%			-Ideal vs. Non-Ideal Theory in terms of end-state and transition-state: If the robotic agent only looks towards the next round, then it might be permissible 			to choose actions which ultimately lead to a very bad state of the world. If we force the robotic agent to calculate the whole path, then we could avoid 				such a bad transition. The latter would be imposed by ideal (end-state) theory, but impose heavy calculation costs on the agent. The former makes						permissible to end in a rather undesirable state of the world, but is less restrictive in terms of calculation costs.
+
+
+\bibliography{mybib}
+
+\end{document}

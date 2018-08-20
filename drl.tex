@@ -1,0 +1,158 @@
+%!Tex root = ./Main.tex
+\section{Deontic Reinforcement Learning}
+
+In this section we develop the framework of deontic reinforcement learning. The idea is that the incentive structure given by rewards as prescribing how the agent has to behave is often not sufficient to ensure morally permissible behaviour. Hence, we argue that norms come prior to rewards. Put differently, just like rewards give the agent a reason to act in a particular way, so do norms. However, norms are more important than the rewards. That means that an agent will forego (high) rewards in order to satisfy a norm. The reasoning for this approach is purely practical. First, how we represent norms is not directly translatable into a numerical value. Therefore, we cannot compare the desirability of achieving a specific reward in terms of violating a norm and vice versa. Second, the only other option would be that rewards are prior to norms. If we were to opt for this, then making use of norms has no influence on the agent's behaviour. This means that our framework collapses into the standard RL approach. Consequently, our solution is that norms are prior to rewards. 
+
+%However, before we can into detail of our account, we need to clarify our viewpoint on ethical norms. Specifically, we discuss whether ethical norms can conflict. Thereafter we follow the initial sketch by \citet{arnold2017value}, but we refine formally some properties of norms in order to make the framework more applicable for computer scientists.
+
+%\include{conflict} %Deleted subsection on the philosophical debate whether norms can conflict. Taken out by advise from Herman 
+
+\subsection{The Framework}
+
+DRL can be described as a tuple: $\langle \mathcal{A,S,R,T,\gamma,AT,V,N} \rangle$. Where the tuple ${\langle \mathcal{A,S,R,T,\gamma} \rangle}$ has the same meaning as in the standard MDP described in section \ref{rledm}. However, we put, for now, a restriction on the transition matrix: in this paper we only deal with deterministic MDP. That means that $\mathcal{T}(s^{\prime},a,s) = \text{Pr}(s^{\prime} | s,a) = [0,1]$. Either taking the action leads to $s^{\prime}$ or it does not. $\mathcal{AT}$ is the set of atomic sentences: $p,q,r,\ldots,\top,\bot$. We define our language inductively as $\varphi := p | \neg \varphi | \psi \wedge \varphi$. $\mathcal{V}$ is the valuation function assigning atomic sentences to states $\mathcal{V}: \mathcal{AT} \rightarrow \mathcal{S}$. This allows us to express that a certain formula is true in a particular state. An example is shown in figure \ref{AT}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics{Graphics/at.pdf}
+	\caption{Propositions can be true or false in different states of the world: ${V(q) = \{s_1, s_2\} }; V(t,r) = \emptyset$. Note, in the graphical representation we leave propositions that are false in a state of the world implicit, e.g. ${V(\neg t) = \{ s_1, s_2 \} }$.}
+	\label{AT}
+\end{figure}
+
+Finally, $\mathcal{N}$ is the set of norms. There are two dimensions to categorize norms. First, we separate norms according to their deontic operators. That is, either \emph{obligatory} or \emph{forbidden}. Obligatory norms imply that something should happen. Forbidden norms, on the other hand, imply that something should not happen. Second, we distinguish between \emph{action norms} and \emph{consequential norms}. Action norms focus on actions that are (not) to be performed. Consequential norms emphasise that a certain proposition should come true (or should be avoided) in the future. The Cartesian product of these dimensions exhausts the space of norms, see table \ref{normstable}. %Reformulate? 
+
+\begin{table}[h]
+\centering
+\begin{tabular}{llll}
+            & Obligatory     & Forbidden     \\ \midrule
+Action      & $O(a \in \mathcal{A}| S \subseteq \mathcal{S})$       & $F(a \in \mathcal{A}|S \subseteq \mathcal{S})$	     \\ \midrule
+Consequence & $O(s^{\prime} \vDash \varphi|S \subseteq \mathcal{S})$ & $F(s^{\prime} \vDash \varphi|S \subseteq \mathcal{S})$ \\ 
+\end{tabular}
+\caption{Any norm in DRL falls in one of these categories.}
+\label{normstable}
+\end{table}
+
+The norm $O(a \in \mathcal{A}| S \subseteq \mathcal{S})$ is to be read as ``In the context $S$, it is obligatory to perform action $a$.'' With the phrase ``In the context of $S$'', we mean that whenever the agent is in a state $s \in S$. Note, that $S$ is a subset of $\mathcal{S}$, which implies that the norm can be relevant in more than one state. For example, one should offer their seat in a bus when a person is standing and that person is elderly or pregnant. 
+
+The norm above has the implication that $Pr(a | S) = 1$. That is, while the agent is in $S$, the probability to choose the action $a$ is equal to one. Similarly, $F(a \in \mathcal{A}|S \subseteq \mathcal{S})$ means that ``In the context $S$, it is forbidden to perform action $a$'', which implies that $Pr(a | S) = 0$.
+
+When it comes to consequential norms, the expression $O(s^{\prime} \vDash \varphi|S \subseteq \mathcal{S})$ is to be read as ``In the context $S$, it is obligatory that the formula $\varphi$ is true in the following state $s^{\prime}$''. The idea is, given that you are in the context $s \in S$, you have to choose some action $a$ such that proposition $\varphi$ becomes true in the future state $s^{\prime}$. Note that this implies that for different $s_1, s_2, \ldots \in S$, the agent might be obligated to take different actions. We express this with the following equation.\footnote{If we extend our framework to non-deterministic POMDP we have the condition ${Pr(a | s \in S) = \argmax_{a \in A(S)} Pr(s^{\prime} \vDash \varphi) \cdot Pr(s^{\prime} | s \in S,a)}$. This corresponds to the idea that we cannot ensure that $\varphi$ becomes true. However, the least we can do is to maximise the probability that $\varphi$ is true in the future. For a prohibitory consequence norm we want to minimise this probability.} \footnote{Some readers will notice that the situation can occur that multiple actions can satisfy the same norm. Then we could encounter that {$Pr(a_1 | s) = Pr(a_2 | s) = 1$} which violates the condition $\sum_a Pr(a | s) = 1$, i.e. the agent can only choose one action in $s_1$. See section \ref{sec:action_guiding} and \ref{sec:dls} how we avoid these results.}
+
+\begin{align}
+	Pr(a | s \in S) = Pr(s^{\prime} \vDash \varphi) \cdot Pr(s^{\prime} | s \in S,a) = 1
+\end{align}
+
+The forbidden consequential norm is to be understood in the same way. Here the implication is that the agent minimises the probability that $\varphi$ is satisfied in the following state $s^{\prime}$. 
+
+\begin{align}
+	Pr(a | s \in S) = Pr(s^{\prime} \vDash \varphi) \cdot Pr(s^{\prime} | s \in S,a) = 0
+\end{align}
+
+Consider the simple example given in figure \ref{fig:drl_example} and the norm ${O(s^{\prime} \vDash t | V(r))}$. Note that we exploit the valuation function in order to define the states where the norm is relevant. When the agent is in state $s_1$, she is obligated to ensure that in the following state $t$ is true. Even though $a_1$ offers the highest reward, the norm excludes performing this action, because $a_1$ would result in $s^{\prime} \nvDash \neg t$. However, taking either $a_2$ or $a_3$ satisfies the norm. That is to say, from the perspective of deontic norms, we are indifferent between performing $a_1$ or $a_2$. But the RL agent is still maximising reward. Given that $s_3$ offers a reward of $40$ and $s_4$ has a reward of $30$, the agent will perform $a_2$. 
+
+\begin{figure}[h!]
+	\centering
+ 	\includegraphics{Graphics/drl_example.pdf}
+ 	\caption{Imposing norms via DRL can result in suboptimal rewards.}
+ 	\label{fig:drl_example}
+\end{figure} 
+
+\subsection{Behavioural Equivalence of Norms}
+%\todo{The content of consequence norms can be expressed in terms of action guiding norms. One problem of C-norms is that MDP is often unknown in real-world applications.}
+
+In the last section we introduced action and consequence norms. The reasoning for the distinction is twofold. First, sometimes it more intuitive to focus on the action and sometimes the norm focuses on the consequence. Consider that a friend of yours wants to hide in your home because she is being hunted by a crazy murderer. Shortly after the murderer appears at your home. You are obligated to ensure that the murderer does not kill our friend. It is left to you whether you misdirect the murderer or use tranquillizer darts to render him unable to fight. The particular action you choose is secondary, what we care about is that some consequence holds true.   
+
+Second, in future developments of DRL we plan to allow for complex temporal norms. These do not focus the immediately following state $s_{t+1}$ but states following thereafter, that is $s_{t+k+2}$. In such a case it might be advantageous to use consequence norms, as we want to prescribe that some proposition comes (not) true in the far future and we do not know ex ante which combinations of actions would lead to the same consequences.\footnote{See section \ref{sec:logic} for a pointer on applications of temporal norms in RL.}    
+
+But, for now, we exclude these kind of temporally complex norms. In this section we want to provide an intuition that any behaviour that is caused by some consequence norm can, in principle, equivalently be produced by a set of appropriate action norms. Now, with behaviour we simply mean that the agent chooses some specific action in a particular state, or avoids to choose some action. We restrict our claim to the cases where we have full information about the transition matrix. For the remainder of this paper we will then limit our analysis to action norms.
+
+Consider the situation in figure \ref{fig:behaviouralequivalence}. Our analysis proceeds as follows. First, we need to distinguish between the case where the $s^{\prime}$ of the consequence norm affects exactly one future state, and where it affects multiple states. We make this distinction by separating the situation in \ref{fig:BE_1} and \ref{fig:BE_1}. Second, we need to distinguish between obligations and prohibitions.
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[]{0.3\textwidth}
+        \includegraphics[width=1\linewidth]{Graphics/BE_1.pdf}
+        \caption{}
+        \label{fig:BE_1}
+    \end{subfigure}
+    \qquad %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+      %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[]{0.3\textwidth}
+        \includegraphics[width=1\linewidth]{Graphics/BE_2.pdf}
+        \caption{}
+        \label{fig:BE_2}
+    \end{subfigure}
+    \caption{}
+    \label{fig:behaviouralequivalence}
+\end{figure}  
+
+Let us begin with \ref{fig:BE_1} and turn towards obligations first. Consider some arbitrary proposition $t$ such that $O(s^{\prime} \vDash t | s_1)$, where Pr$(s^{\prime}| a, s_1) = 1$ for some action $a$ that is available in $s_1$. Moreover $t$ is satisfied by exactly one following state, here $s_2$. The agent consequently performs $a_1$. We could have made use of an action norm: $O( a_1 | s_1)$. Again, the agent would perform $a_1$ and end up in state $s_2$, such that $s_2 \vDash t$. From the agent's perspective it plays no matter how we instantiate her behaviour, both proposed norms result in the same behaviour. 
+
+Next, consider that the norm is $F(s^{\prime} \vDash t | s_1)$. The behaviour of the agent is that she does not choose an action that leads to $s^{\prime} \vDash t$. Hence, in this case she would have to perform $a_2$ to get to state $s_3$, because $s_3 \vDash \neg t$. Alternatively, we could have formulated the norm $F(a_1 | s_1)$ or even $O(a_2 | s_1)$. Again the agent would perform $a_2$ to get to $s_3$. The behaviour of the agent is identical.
+
+Let us now move to the situation \ref{fig:BE_2} and consider again the obligation $O(s^{\prime} \vDash t | s_1)$. Since both $s_2$ and $s_3$ satisfy the proposition $t$, the agent is indifferent between moving to either of these states. At the same time, we could have implemented the norm $O(a_1 \vee a_2 | s_1)$. Here the agent can choose to perform either $a_1$ or $a_2$, as it is not possible to perform both actions.\footnote{More specifically, the agent is in a DLS. We present our solution to this problem in \ref{sec:dls}. But the agent being in a DLS does not have any implication for our claim that the behaviour stemming from the consequence norm can also be produced by the action norm.} 
+
+Lastly, the behaviour that is instantiated by the norm $F(s^{\prime} \vDash t | s_1)$ can be produced by the norm $F(a_1 \wedge a_2 | s_1)$. The agent is prohibited to choose both $a_1$ and $a_2$ and cannot move to either $s_2$ or $s_3$.
+
+\subsection{Requirements for Action-Guiding Norms}
+\label{sec:action_guiding}
+
+Norms as envisioned in this paper are action guiding, i.e. they tell the agent how to behave. Consider that you are under the obligation to help your neighbours and you are also under an obligation to not help your neighbours. These two norms taken together are not action guiding. On the contrary, they leave you confused about what you ought to do.
+
+So far we have not specified any requirements that norms in our framework have to satisfy in order to be well-defined, i.e. to be action-guiding. Our starting point for the subsequent analysis is Kant's principle %\todo{CITE} 
+``ought implies can''. This principle asserts that one can only be under an obligation to $\phi$ if, and only if, one has the ability to perform $\phi$. There is much discussion about when someone truly has the ability to $\phi$ (see for an example the discussion revolving around motivation and human nature \citep{estlund2011human}).
+
+However, it is uncontroversial that one minimal implication of ``ought implies can'' is that two norms are not contradictory. The three pairs of norms in equation \eqref{eq:contra_norm1} -- \eqref{eq:contra_norm3} violate this requirement. The first allows for the problematic case described above, where you ought to help and not to help your neighbour, given that they have asked. The same dilemma, put differently, is described by equation \eqref{eq:contra_norm2}. Lastly, it would be just as problematic were a norm to tell you that you ought to help your neighbour, while it is simultaneously forbidden to help your neighbour. 
+
+\begin{align}
+	&O(a | s) \wedge O(\neg a | s) \label{eq:contra_norm1}\\
+	&F(a | s) \wedge F(\neg a | s) \label{eq:contra_norm2}\\
+	&O(a | s) \wedge F(a | s) \label{eq:contra_norm3}
+\end{align}
+
+Note that we do not require logical consistency over \emph{all} contexts. It is permissible that one action may be obligatory in some context, but not obligatory or even forbidden in another context:
+
+\begin{align}
+ 	O(a | S^{\prime}) &\wedge O(\neg a | S^{\prime\prime})  &\text{where } S^{\prime} \cap S^{\prime\prime} = \emptyset \label{eq:norm_context1}\\
+ 	F(a | S^{\prime}) &\wedge F(\neg a | S^{\prime\prime})  &\text{where } S^{\prime} \cap S^{\prime\prime} = \emptyset \label{eq:norm_context2}\\
+ 	O(a | S^{\prime}) &\wedge F(a | S^{\prime\prime})  &\text{where } S^{\prime} \cap S^{\prime\prime} = \emptyset \label{eq:norm_context3}
+\end{align} 
+
+%The reason why we allow for this as we are now only concerned with ensuring that our norms as are action guiding. 
+An agent following an arbitrary set of norms that violates \eqref{eq:contra_norm1} -- \eqref{eq:contra_norm3} may end up in a state with contradicting imperatives, leaving the agent unable to act. On the other hand, if the norms satisfy \eqref{eq:norm_context1} -- \eqref{eq:norm_context3} we have no logical inconsistency. As an example, consider that a doctor is under an obligation to prescribe a certain drug to cardiac failure patients. The doctor is at the same time under an obligation to not prescribe that drug if patient suffers from depression. Here, the context is different, i.e. the medical conditions of the patient, and we do not face an inconsistency. 
+
+However, it is correct that our system does not prohibit \emph{content inconsistency}. Content inconsistency means that the inconsistency does not derive from an inconsistency over the context, but rather that the inconsistency stems from the content of the norm. For example, it is not logically inconsistent to state that you are under an obligation to murder given sunny weather and that you are under an obligation to not murder given that the weather is rainy. However, the context does not suffice as a \emph{justification} that you are obliged to murder while the sun shines. We have a content inconsistency. We leave it to practitioners of DRL to ensure that their models do not have content inconsistencies.  
+
+Apart from logical consistency, we impose the restrictions that any well-defined obligatory action norm may only specify an action that is available for the agent to perform in the state. Let $\mathcal{A}(s)$ be defined as the set of actions that are available to the agent in state $s \in \mathcal{S}$. We then require that:
+
+\begin{align}
+	O(a | s) \rightarrow \exists a: a \in \mathcal{A}(s) \label{eq:available states}  	
+\end{align}  
+
+The restriction is a direct result of interpreting ``ought implies can'', as it requires that any obligatory action norm must refer to an action that can actually be performed by the agent. 
+
+Note that we do not impose the equivalent restriction on forbidden action norms. That is, a forbidden action norm may specify an action that is actually not available at that state that the norm specifies. Again the reasoning is that we want to ensure that our framework is action guiding. Any norm prohibiting the performance of an action that the agent cannot perform anyway has no influence on the agent's behaviour.
+
+Unfortunately, as we shall see in the next section, equation \eqref{eq:norm_context1} -- \eqref{eq:available states} are not enough to ensure that our framework is action guiding. This is the problem of deontic lock states.
+
+%In the preceding section we introduced deontic norms. We have thus far not made any assumptions that need to be satisfied in order to ensure that the norms are well-defined. One restriction that we need to impose is that obligatory and forbidden norms do not contradict one another. Consider that a moral theory prescribes that you are obligated to tell the truth and at the same time, it forbids you to tell you to tell the truth. Such a theory would violate the formula ``ought implies can'', since you cannot respect both norms.\footnote{Note that this contradiction free requirement only applies to norms that apply to the same context. We allow for the case where $O(a|s)$ and $F(a | r)$, where $s,r \in \mathcal{S}$ and $s \neq r$.} We express this requirement in equation \eqref{eq:contradictionfree}. Let $N_A$ be the set of action norms, $N_C$ the set of consequential norms
+
+%\begin{align}\label{eq:contradictionfree}
+% 	\{O ( a \in A | S \subseteq \mathcal{S}) \} 					\cup \{F ( a \in A | S \subseteq \mathcal{S}) \} 					= \emptyset\\
+% 	\{O ( s^{\prime} \vDash \varphi | S \subseteq \mathcal{S}) \} 	\cup \{F ( s^{\prime} \vDash \varphi | S \subseteq \mathcal{S}) \} 	= \emptyset 
+%\end{align} 
+
+
+\subsection{Deontic Lock States}
+\label{sec:dls}
+
+The problem of DLS, as already described in section \ref{sec:problems_scheutz}, is a collision of multiple norms. That is, either two obligations that apply to the same situation, prescribing different actions one should perform or that any action is forbidden. In such a situation the norms are not action-guiding, the agent is unable to perform any action and is locked in the state. 
+
+Our solution to this problem is the introduction of a preference frame $\mathcal{P}$ over the set of norms $\mathcal{N}$. $\mathcal{P}$ assigns an ordering $\langle N, \succsim \rangle$, where $N \in \mathcal{N}$. The preference relation $\succsim$ is a transitive, reflexive, and complete relation.\footnote{When the structure of the MDP is known, then the preference relation needs only to be complete with regard to norms that apply to the same context $S \subseteq \mathcal{S}$. This is sufficient to ensure that the agent is capable of finding a solution to the MDP. To be even more precise, we need only a separate ordering of forbidden and obligatory norms. It is not needed to have an ordering of both kinds together.} The intended reading of $N_i \succ N_j$ is that abiding by $N_i$ is more important than abiding $N_j$. Or, put differently, that a violation of $N_j$ is not as bad as a violation of $N_i$. Just because one cannot behave in an ideal way, where one respects all norms, does not imply that one is exempt from further moral obligations. The idea is then that some norms carry more weight, or are more important, than others. 
+
+Consider again the situation from figure \ref{fig:drl_example} and the following norms $\mathcal{N}:\{N_1 = F(a_1 | s_1), N_2 = F(a_2 | s_1), N_3 = F(a_3 | s_1)\}$ and the preference frame $\mathcal{P}: \{N_1 \succ N_2, N_1 \succ N_3, N_2 \sim N_3 \}$. The agent is being told that any action that is available is forbidden. However, given the preference frame, the agent knows that violating $N_2$ or $N_3$ is better than violating $N_1$. Furthermore, the agent knows that we are indifferent whether $N_2$ or $N_3$ is violated. Given that the agent has to perform a forbidden action, the agent is now free to choose between $a_2$ and $a_3$. However, if we take the rewards into account, then the agent will pick $a_2$ to maximise the return.
+
+With the preference frame we can avoid the case where an agent is locked in a state. Unfortunately, there is a caveat of our approach. The agent can learn a policy that leads through a DLS, although an alternative path is available (even with the same return). This can happen because our solution to DLS does not teach the agent that passing through a DLS is something that should be avoided. One can try to remedy for this fact e.g. by decreasing the return of the agent via subtracting a constant value from the return or discounting future returns to a higher rate. But we are sceptical whether a unique approach exists that works for any MDP, since different MDPs can have vastly different values for rewards. 
+
+There is also a more general problem. Sometimes we want the agent to move through a DLS, especially when the ethical dilemma is small (such as telling a white lie) and the goal is morally very desirable (ending poverty). On the other hand, we can imagine that we want the agent to avoid the DLS. This is the case when the ethical dilemma is highly problematic (an autonomous car that overruns innocent pedestrians) and the goal has little moral value (getting the passenger faster home). Whether a DLS should be avoided or not depends on the particular model and we believe that no general solution is feasible. 
+
+%Nevertheless, at the very least the preference frame, in combination with the set of norms, guarantees that the agent does not get stuck in a state. Hence, our model ensures that that the norms are action-guiding.
